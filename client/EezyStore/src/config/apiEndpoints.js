@@ -7,31 +7,50 @@ const API_ENDPOINTS = {
     },
 
     adminAuth: {
-        login: '/admin/login',
+      login: '/admin/login',
     },
     
+    adminCustomerManagement: {
+      list: '/admin/customers',
+      approve: '/admin/approve-customer',
+      block: '/admin/block-customer',
+      unBlock: '/admin/unblock-customer',
+    },
+
+    AdminProductsManagement: {
+      list: '/admin/products/',
+      create: '/admin/products/create/',
+      edit: '/admin/products/',
+      delete: '/admin/products/',
+    },
+
     products: {
-      list: '/products/',
+      list: '/customer/products/',
       detail: (id) => `/products/${id}/`,
       categories: '/products/categories/',
       featured: '/products/featured/',
     },
-    
+
+    cart: {
+      get: '/customer/carts/',
+      add: '/customer/cart/add/',
+      update: '/customer/cart/item/',
+      remove: '/customer/cart/item/',
+    },
+
+    checkout: {
+      get_add: '/customer/addresses/',
+      select: '/customer/addresses/select/',
+      list: '/customer/cart/checkout/',
+      placeOrder: '/customer/cart/checkout/place-order/'
+    },
+
     orders: {
       create: '/orders/',
       list: '/orders/',
       detail: (id) => `/orders/${id}/`,
       cancel: (id) => `/orders/${id}/cancel/`,
     },
-    
-    cart: {
-      get: '/cart/',
-      add: '/cart/add/',
-      update: '/cart/update/',
-      remove: '/cart/remove/',
-      clear: '/cart/clear/',
-    },
-
   };
   
   export default API_ENDPOINTS;

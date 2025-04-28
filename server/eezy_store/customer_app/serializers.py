@@ -2,6 +2,8 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from core_app.models import Product, Rating, Order, OrderItem, Cart, CartItem, Address
+
 
 class UserSerializer(serializers.ModelSerializer):
     """
@@ -60,10 +62,65 @@ class LoginSerializer(serializers.Serializer):
             if not user.check_password(password):
                 raise serializers.ValidationError({'error': "password-mismatch", "message": "Incorrect password."})
             if not user.is_active:
-                raise serializers.ValidationError({"error": "account-inactive", "message": "Your account is inactive. Please contact support."})
+                if not user.last_login:
+                    raise serializers.ValidationError({"error": "account-not-activated", "message": "Your account is not activated yet. Please check your email."})
+                raise serializers.ValidationError({"error": "account-blocked", "message": "Your account is blocked by admin. Please contact support."})
             attrs['user'] = user
             return attrs
         
         except User.DoesNotExist:
             raise serializers.ValidationError({"error": "not-exist", "message": "Please check your email and try again."})
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    average_rating = serializers.FloatField(read_only=True)
+    rating_count = serializers.IntegerField(read_only=True)
+    image = serializers.ImageField()
+
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'description', 'price', 'image', 'average_rating', 'rating_count']
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+    
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity']
+
+class CartSerializer(serializers.ModelSerializer):
+    items = CartItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'user', 'items', 'created_at', 'updated_at']
+        
+class UpdateCartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = ['id', 'quantity']
+
+class RemoveCartItemSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = '__all__'
+        read_only_fields = ['user', 'created_at', 'updated_at']
+        
+
+class CheckoutCartSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name')
+    product_price = serializers.DecimalField(source='product.price', max_digits=10, decimal_places=2)
+    total_price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product_name', 'quantity', 'product_price', 'total_price']
+
+    def get_total_price(self, obj):
+        return obj.quantity * obj.product.price
 

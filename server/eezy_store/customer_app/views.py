@@ -8,8 +8,14 @@ from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, Ou
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken
 
+from core_app.models import Product, Rating, Address, Order, OrderItem, Cart, CartItem
 
-from .serializers import UserSerializer, LoginSerializer
+from .serializers import (
+    UserSerializer, LoginSerializer, ProductSerializer,
+    CartItemSerializer, CartSerializer,
+    UpdateCartItemSerializer, RemoveCartItemSerializer,
+    AddressSerializer, CheckoutCartSerializer,
+    OrderSerializer)
 
 # Create your views here.
 
@@ -58,6 +64,7 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
+        print(user)
         login(request, user)
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
@@ -65,6 +72,7 @@ class LoginView(APIView):
             'user': UserSerializer(self.request.user).data,
             "access": access_token,
         }, status=status.HTTP_200_OK)
+        
         response.set_cookie(
             key='refresh',
             value=str(refresh),
@@ -112,17 +120,219 @@ class SecureTokenRefreshView(TokenRefreshView):
 
     def post(self, request, *args, **kwargs):
         user_agent = request.META.get('HTTP_USER_AGENT', '')
-        print("User Agent" ,user_agent)
         ip = request.META.get('REMOTE_ADDR', '')
-        print("IP" ,ip)
-        # stored_ua = request.COOKIES.get('ua')
-        # stored_ip = request.COOKIES.get('ip')
-        # print("Stored" ,stored_ua, stored_ip)
-        # if stored_ua != user_agent or stored_ip != ip:
-        #     return Response({'detail': 'Invalid environment.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        print("User Agent", user_agent)
+        print("IP", ip)
+
+        refresh_token = request.COOKIES.get('refresh')
+        
+        if not refresh_token:
+            return Response({'detail': 'Refresh token missing.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(data={'refresh': refresh_token})
 
         try:
-            print("Done")
-            return super().post(request, *args, **kwargs)
-        except InvalidToken as e:
+            serializer.is_valid(raise_exception=True)
+        except InvalidToken:
             return Response({'detail': 'Invalid or expired token.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        print("Done")
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        
+
+class ListAllProductsView(generics.ListAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticated]  
+    queryset = Product.objects.active().with_ratings()
+
+
+class ListAllCartsView(generics.ListAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user) 
+
+
+class AddToCartView(generics.GenericAPIView):
+    serializer_class = CartItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        product_id = request.data.get('product_id')
+        quantity = request.data.get('quantity', 1)
+
+        if not product_id:
+            return Response({'error': 'Product ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        cart, created = Cart.objects.get_or_create(user=request.user)
+
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+        if not created:
+            cart_item.quantity += int(quantity)
+            cart_item.save()
+
+        serializer = CartSerializer(cart)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class UpdateCartItemView(generics.UpdateAPIView):
+    queryset = CartItem.objects.all()
+    serializer_class = UpdateCartItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request, *args, **kwargs):
+        item = self.get_object()
+        if item.cart.user != request.user:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+        
+        quantity = request.data.get('quantity')
+        
+        if quantity is None:
+            return Response({'error': 'Quantity is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            quantity = int(quantity)
+        except ValueError:
+            return Response({'error': 'Invalid quantity.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if quantity > 10:
+            return Response({'error': 'Max 10 quantity allowed.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        item.quantity = quantity
+        item.save()
+        return Response({'message': 'Quantity updated'}, status=status.HTTP_200_OK)
+
+
+class RemoveCartItemView(generics.DestroyAPIView):
+    queryset = CartItem.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        item = self.get_object()
+        if item.cart.user != request.user:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+        
+        item.delete()
+        return Response({'message': 'Item removed from cart.'}, status=status.HTTP_204_NO_CONTENT)
+    
+    
+class AddressListCreateView(generics.ListCreateAPIView):
+    serializer_class = AddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        address = Address.objects.filter(user=self.request.user).order_by('-created_at')
+        return address
+    
+    def perform_create(self, serializer):
+        if serializer.validated_data.get('is_default', False):
+            Address.objects.filter(user=self.request.user, is_default=True).update(is_default=False)
+   
+        serializer.save(user=self.request.user)
+
+
+class AddressSelectView(generics.UpdateAPIView):
+    serializer_class = AddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Address.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        address_id = kwargs.get('pk')
+
+        try:
+            address = Address.objects.get(pk=address_id, user=request.user)
+        except Address.DoesNotExist:
+            return Response({'error': 'Address not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        Address.objects.filter(user=request.user, is_default=True).update(is_default=False)
+        address.is_default = True
+        address.save(update_fields=['is_default'])
+
+        serializer = self.get_serializer(address)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+class CheckoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        try:
+            cart = Cart.objects.prefetch_related('items__product').get(user=request.user)
+            serializer = CartSerializer(cart)
+            total_price = sum(item.quantity * item.product.price for item in cart.get_cart_items())
+
+            return Response({
+                'cart_items': serializer.data['items'],
+                'total_price': total_price
+            })
+        except Cart.DoesNotExist:
+            return Response({
+                'cart_items': [],
+                'total_price': 0
+            })
+
+
+class PlaceOrderView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        address_id = request.data.get('address_id')
+
+        if not address_id:
+            return Response({'detail': 'Address ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            address = Address.objects.get(id=address_id, user=request.user)
+        except Address.DoesNotExist:
+            return Response({'detail': 'Address not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            cart = Cart.objects.prefetch_related('items__product').get(user=request.user)
+            cart_items = cart.get_cart_items()
+
+            if not cart_items.exists():
+                return Response({'detail': 'Cart is empty.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            order = Order.objects.create(
+                user=request.user,
+                address=address,
+                status='approved',
+                total_amount=0 
+            )
+
+            total = 0
+            order_items = []
+            for item in cart_items:
+                order_item = OrderItem(
+                    order=order,
+                    product=item.product,
+                    quantity=item.quantity,
+                    price=item.product.price
+                )
+                total += item.quantity * item.product.price
+                order_items.append(order_item)
+            
+            OrderItem.objects.bulk_create(order_items)
+
+            order.total_amount = total
+            order.save()
+
+            cart.items.all().delete()
+
+            serialized_order = OrderSerializer(order)
+
+            return Response({
+                'detail': 'Order placed successfully.',
+                'order': serialized_order.data
+            }, status=status.HTTP_201_CREATED)
+
+        except Cart.DoesNotExist:
+            return Response({'detail': 'Cart not found.'}, status=status.HTTP_404_NOT_FOUND)

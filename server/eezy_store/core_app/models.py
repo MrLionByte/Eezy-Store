@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Avg, Count
 # Create your models here.
 
 class Address(models.Model):
@@ -21,22 +22,50 @@ class Address(models.Model):
     
     def __str__(self):
         return f"{self.street}, {self.city}, {self.state}, {self.country}, {self.postal_code}"
-    
-    
+
+
+class ProductQuerySet(models.QuerySet):
+    def with_ratings(self):
+        return self.annotate(
+            average_rating=Avg('ratings__score'),
+            rating_count=Count('ratings')
+        )
+
+    def active(self):
+        return self.filter(is_deleted=False)
+
+class ProductManager(models.Manager):
+    def get_queryset(self):
+        return ProductQuerySet(self.model, using=self._db)
+
+    def with_ratings(self):
+        return self.get_queryset().with_ratings()
+
+    def active(self):
+        return self.get_queryset().active()
+
+
 class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to='products/')
+    image = models.ImageField(upload_to='media/products/')
+    is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def average_rating(self):
-        return self.rating_set.aggregate(avg=models.Avg('score'))['avg'] or 0
+    objects = ProductManager()
 
     def __str__(self):
         return self.name
     
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
+
+    def restore(self):
+        self.is_deleted = False
+        self.save()
     
 class Rating(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='ratings')
@@ -47,8 +76,38 @@ class Rating(models.Model):
     
     def __str__(self):
         return f"{self.user.username} rated {self.product.name} with {self.score}"
+
+
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Cart'
+        verbose_name_plural = 'Carts'
+        ordering = ['-created_at']
     
+    def __str__(self):
+        return f"{self.user.username} - Cart"
     
+    def get_cart_items(self):
+        return self.items.select_related('product').all()
+    
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        verbose_name = 'Cart Item'
+        verbose_name_plural = 'Cart Items'
+        ordering = ['-cart__created_at']
+    
+    def __str__(self):
+        return f"{self.product.name} in {self.cart}"
+
+
 class Order(models.Model):
     STATUS_CHOICES = [
         ('approved', 'Approved'),
@@ -71,6 +130,14 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
     
+    def calculate_total(self):
+        total = 0
+        items = self.items.select_related('product') 
+        for item in items:
+            total += item.quantity * item.product.price
+        return total
+
+    
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -85,28 +152,3 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.product.name} in {self.order}"
     
-class Cart(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = 'Cart'
-        verbose_name_plural = 'Carts'
-        ordering = ['-created_at']
-    
-    def __str__(self):
-        return f"{self.user.username} - Cart"
-    
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-
-    class Meta:
-        verbose_name = 'Cart Item'
-        verbose_name_plural = 'Cart Items'
-        ordering = ['-cart__created_at']
-    
-    def __str__(self):
-        return f"{self.product.name} in {self.cart}"

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import LoginForm from '../../components/auth/LoginForm';
+import AdminLoginForm from '../../../components/auth/AdminLoginForm';
 
 export default function AdminLoginPage() {
   useEffect(() => {
@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
           <h1 className="text-3xl font-bold">Eezy Store Admin</h1>
           <p className="mt-2 text-gray-600">Login to admin panel</p>
         </div>
-        <LoginForm />
+        <AdminLoginForm />
       </div>
     </div>
   );

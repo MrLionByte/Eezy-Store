@@ -6,7 +6,17 @@ const PublicRoute = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('access');
-    setIsAuthenticated(!!token);
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (token && user.isAdmin) {
+        console.log("User is admin");
+        
+        setIsAuthenticated(true);
+        console.log(isAuthenticated);
+        
+    } else{
+        console.log("User is not admin");
+        setIsAuthenticated(false);
+    }
   }, []);
 
   if (isAuthenticated === null) {
@@ -14,7 +24,8 @@ const PublicRoute = ({ children }) => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/store" />;
+    console.log("User is authenticated");
+    return <Navigate to="/admin" />;
   }
 
   return children;

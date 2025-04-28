@@ -45,17 +45,16 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (originalRequest.url === '/auth/token/refresh/') {
+    if (originalRequest.url === '/customer/token/refresh') {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login?session=expired';
+      window.location.href = '/login';
       return Promise.reject(error);
     }
-
     originalRequest._retry = true;
 
     try {
-      const response = await api.post('/auth/token/refresh/');
+      const response = await api.post(API_ENDPOINTS.auth.refreshToken);
       
       if (response.data.access) {
         localStorage.setItem('token', response.data.access);
@@ -67,7 +66,7 @@ api.interceptors.response.use(
       console.error('Token refresh failed:', refreshError);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login?session=expired';
+      window.location.href = '/login';
       return Promise.reject(refreshError);
     }
   }
