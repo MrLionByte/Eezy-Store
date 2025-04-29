@@ -10,6 +10,8 @@ import { Star, Package } from 'lucide-react';
 
 const Orders = () => {
   const navigate = useNavigate();
+  const  imageBaseUrl = import.meta.env.VITE_IMAGE_URL
+
   const {
     orders,
     expandedOrder,
@@ -169,7 +171,7 @@ const Orders = () => {
                                 <div className="flex items-start">
                                   <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden">
                                     <img
-                                      src={"http://localhost:8000/"+`${item.product.image}`}
+                                      src={`${imageBaseUrl}`+`${item.product.image}`}
                                       alt={item.product_name}
                                       className="w-full h-full object-cover"
                                     />

@@ -33,6 +33,8 @@ const Checkout = () => {
     confirmPlaceOrder,
   } = useCheckout();
 
+  const  imageBaseUrl = import.meta.env.VITE_IMAGE_URL;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Checkout</h1>
@@ -147,7 +149,7 @@ const Checkout = () => {
                 {cartItems?.map((item) => (
                   <li key={item.product.id} className="py-4 flex">
                     <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden">
-                      <img src={"http://localhost:8000/"+`${item.product.image}`} alt={item.product.name} className="w-full h-full object-cover" />
+                      <img src={`${imageBaseUrl}`+`${item.product.image}`} alt={item.product.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="ml-4 flex-1">
                       <div className="flex justify-between">
