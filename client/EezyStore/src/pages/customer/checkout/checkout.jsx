@@ -40,7 +40,6 @@ const Checkout = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
 
-          {/* Address Section */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-medium text-gray-900">Shipping Address</h2>
@@ -57,7 +56,7 @@ const Checkout = () => {
                     <DialogTitle>Add New Address</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleAddressSubmit} className="space-y-4 mt-4">
-                    {/* New Address Fields */}
+
                     <div className="grid grid-cols-1 gap-4">
                       {['name', 'street', 'city', 'state', 'zipCode', 'country', 'phone'].map((field) => (
                         <div key={field}>
@@ -95,7 +94,6 @@ const Checkout = () => {
               </Dialog>
             </div>
 
-            {/* Addresses */}
             {addresses?.length === 0 ? (
               <div className="text-center py-8">
                 <Home className="mx-auto h-12 w-12 text-gray-400" />
@@ -124,7 +122,6 @@ const Checkout = () => {
             )}
           </div>
 
-          {/* Payment Section */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Payment Method</h2>
             <div className="space-y-4">
@@ -141,7 +138,6 @@ const Checkout = () => {
           </div>
         </div>
 
-        {/* Order Summary */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-sm p-6 sticky top-20">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Order Summary</h2>
@@ -174,7 +170,7 @@ const Checkout = () => {
             </div>
 
             <div className="mt-6">
-              {/* Order Confirm Alert */}
+
               <AlertDialog open={isOrderConfirmOpen} onOpenChange={setIsOrderConfirmOpen}>
                 <AlertDialogTrigger asChild>
                   <Button 

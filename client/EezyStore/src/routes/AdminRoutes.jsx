@@ -24,11 +24,6 @@ export default function AdminRoutes() {
           <Route path="products" element={<Products />} />
           <Route path="customer-management" element={<CustomerManagement />} />
           <Route path="orders" element={<Orders />} />
-          {/* <Route path="settings" element={<Settings />} /> */}
-          {/* <Route path="reports" element={<Reports />} /> */}
-          {/* <Route path="analytics" element={<Analytics />} /> */}
-          {/* <Route path="notifications" element={<Notifications />} /> */}
-          {/* <Route path="support" element={<Support />} /> */}
         </Route>
       </Route>
 

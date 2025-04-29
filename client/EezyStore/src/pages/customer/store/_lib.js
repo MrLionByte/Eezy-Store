@@ -11,14 +11,13 @@ export const useProducts = () => {
     try {
       const data = await productService.list();
       setProducts(data);
-      // Optionally set ratings separately if needed
       const ratings = {};
       data.forEach(product => {
         ratings[product.id] = product.average_rating || 0;
       });
       setProductRatings(ratings);
     } catch (error) {
-      console.error('Failed to fetch products:', error);
+      // console.error('Failed to fetch products:', error);
     } finally {
       setLoading(false);
     }
@@ -35,10 +34,10 @@ export const useProducts = () => {
         title: "Added to Cart",
         description: `${product.name} has been added to your cart.`,
       });
-      console.log(updatedCart);
+      // console.log(updatedCart);
       
     } catch (error) {
-      console.error("Failed to add to cart:", error);
+      // console.error("Failed to add to cart:", error);
       toast({
         title: "Error",
         description: "Failed to add product to cart. Please try again.",

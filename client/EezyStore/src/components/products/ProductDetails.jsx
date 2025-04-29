@@ -61,7 +61,6 @@ export function ProductDetails({ product, onClose }) {
           </div>
         </div>
 
-        {/* Reviews Section */}
         {product.reviews && product.reviews.length > 0 && (
           <div className="pt-4 mt-4 border-t">
             <h3 className="font-medium mb-2">Customer Reviews</h3>

@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Minus, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { useCart } from './_lib';  // Importing the custom hook
+import { useCart } from './_lib'; 
 import { toast } from "@/hooks/use-toast";
+import Layout from '../../../components/layout/Layout';
 
 const Cart = () => {
   const {
@@ -29,7 +30,7 @@ const Cart = () => {
   }, [editingItemId, cartItems]);
 
   const handleLocalQuantityChange = (change) => {
-    setNewQuantity(prev => Math.max(1, prev + change)); // Ensure quantity doesn't go below 1
+    setNewQuantity(prev => Math.max(1, prev + change));
   };
 
   const handleConfirmQuantity = async () => {
@@ -43,16 +44,16 @@ const Cart = () => {
     }
 
     try {
-      // Call the cartService to update the quantity
-      await handleQuantityChange(editingItemId, newQuantity); // Use the logic from the custom hook
+      await handleQuantityChange(editingItemId, newQuantity); 
       toast({ title: "Updated!", description: "Quantity updated successfully." });
-      setEditingItemId(null); // Reset the editing state after confirmation
+      setEditingItemId(null); 
     } catch (error) {
       console.error('Error updating quantity:', error);
     }
   };
 
   return (
+    <Layout>
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Your Shopping Cart</h1>
 
@@ -154,9 +155,9 @@ const Cart = () => {
                 <Button variant="outline" onClick={() => navigate('/store')}>
                   Continue Shopping
                 </Button>
-                <Button variant="destructive" onClick={clearCart}> {/* Clear Cart logic from custom hook */}
+                {/* <Button variant="destructive" onClick={clearCart}>
                   Clear Cart
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>
@@ -190,6 +191,7 @@ const Cart = () => {
         </div>
       )}
     </div>
+    </Layout>
   );
 };
 

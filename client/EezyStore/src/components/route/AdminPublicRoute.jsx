@@ -8,13 +8,8 @@ const PublicRoute = ({ children }) => {
     const token = localStorage.getItem('access');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (token && user.isAdmin) {
-        console.log("User is admin");
-        
-        setIsAuthenticated(true);
-        console.log(isAuthenticated);
-        
+        setIsAuthenticated(true);        
     } else{
-        console.log("User is not admin");
         setIsAuthenticated(false);
     }
   }, []);
@@ -24,7 +19,6 @@ const PublicRoute = ({ children }) => {
   }
 
   if (isAuthenticated) {
-    console.log("User is authenticated");
     return <Navigate to="/admin" />;
   }
 

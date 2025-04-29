@@ -34,7 +34,6 @@ export default function SignupForm() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    console.log(formData);
     
     try {
         const response = await authService.signup(formData);

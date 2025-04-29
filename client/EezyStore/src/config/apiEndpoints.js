@@ -24,6 +24,10 @@ const API_ENDPOINTS = {
       delete: '/admin/products/',
     },
 
+    AdminOrdersManagement: {
+      order: '/admin/orders/',
+    },
+
     products: {
       list: '/customer/products/',
       detail: (id) => `/products/${id}/`,
@@ -46,10 +50,8 @@ const API_ENDPOINTS = {
     },
 
     orders: {
-      create: '/orders/',
-      list: '/orders/',
-      detail: (id) => `/orders/${id}/`,
-      cancel: (id) => `/orders/${id}/cancel/`,
+      list: '/customer/orders/',
+      rate: '/customer/orders/rate/',
     },
   };
   

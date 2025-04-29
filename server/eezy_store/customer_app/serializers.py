@@ -124,3 +124,32 @@ class CheckoutCartSerializer(serializers.ModelSerializer):
     def get_total_price(self, obj):
         return obj.quantity * obj.product.price
 
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+    product_name = serializers.CharField(source='product.name')
+    product_price = serializers.DecimalField(source='price', max_digits=10, decimal_places=2)
+    rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product_name', 'product_price', 'quantity', 'rating', 'product']
+    
+    def get_rating(self, obj):
+        user = self.context.get('user')
+        if user:
+            rating = Rating.objects.filter(product=obj.product, user=user).first()
+            return rating.score if rating else None
+        return None
+    
+class OrderSerializer(serializers.ModelSerializer):
+    address = serializers.StringRelatedField()  
+    items = OrderItemSerializer(many=True)
+    total_amount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ['id', 'status', 'total_amount', 'created_at', 'updated_at', 'address', 'items']
+
+    def get_total_amount(self, obj):
+        return str(obj.calculate_total())
+

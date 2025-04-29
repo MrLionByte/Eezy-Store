@@ -34,7 +34,6 @@ const OrderConfirmation = () => {
           <p className="text-gray-600">Thank you for your purchase. Your order is being processed.</p>
         </div>
 
-        {/* Order Summary */}
         <div className="border-t border-b border-gray-200 py-6 mb-6">
           <SummaryRow label="Order Number" value={order.id.replace('order-', '#')} />
           <SummaryRow label="Date" value={new Date(order.date).toLocaleDateString()} />
@@ -42,7 +41,6 @@ const OrderConfirmation = () => {
           <SummaryRow label="Payment Method" value={order.paymentMethod === 'credit-card' ? 'Credit/Debit Card' : 'PayPal'} />
         </div>
 
-        {/* Items */}
         <div className="mb-8">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Order Items</h2>
           <div className="flow-root">
@@ -63,7 +61,6 @@ const OrderConfirmation = () => {
           </div>
         </div>
 
-        {/* Address */}
         <div className="mb-8">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Shipping Address</h2>
           <div className="text-sm text-gray-600 border rounded-lg border-gray-200 p-4">
@@ -76,7 +73,6 @@ const OrderConfirmation = () => {
           </div>
         </div>
 
-        {/* Delivery Status */}
         <div className="mb-8">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Delivery Information</h2>
           <div className="bg-gray-50 rounded-lg p-4">

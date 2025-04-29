@@ -47,6 +47,13 @@ class CustomerListSerializer(serializers.ModelSerializer):
         return [group.name for group in obj.groups.all()]
 
 
+class UserSerializer(serializers.ModelSerializer):
+    """Serializer for user data in admin views"""
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+
+
 class ProductSerializer(serializers.ModelSerializer):
     average_rating = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
     rating_count = serializers.IntegerField(read_only=True)
@@ -57,8 +64,66 @@ class ProductSerializer(serializers.ModelSerializer):
                   'created_at', 'updated_at', 'average_rating', 'rating_count']
 
 
+class AddressSerializer(serializers.ModelSerializer):
+    """Serializer for address data in admin views"""
+    class Meta:
+        model = Address
+        fields = '__all__'
 
 
-
+class OrderItemSerializer(serializers.ModelSerializer):
+    """Serializer for order items in admin views"""
+    product = ProductSerializer()
     
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product', 'quantity', 'price']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    """Serializer for order list in admin views"""
+    user = UserSerializer()
+    address = serializers.StringRelatedField()
+    items_count = serializers.SerializerMethodField()
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, source='calculate_total')
     
+    class Meta:
+        model = Order
+        fields = [
+            'id', 'user', 'address', 'status', 'total_amount', 
+            'items_count', 'created_at', 'updated_at'
+        ]
+    
+    def get_items_count(self, obj):
+        return obj.items.count()
+
+
+class OrderDetailSerializer(serializers.ModelSerializer):
+    """Detailed serializer for a single order in admin views"""
+    user = UserSerializer()
+    address = AddressSerializer()
+    items = OrderItemSerializer(many=True)
+    total_amount = serializers.DecimalField(max_digits=10, decimal_places=2, source='calculate_total')
+    
+    class Meta:
+        model = Order
+        fields = [
+            'id', 'user', 'address', 'status', 'total_amount',
+            'items', 'created_at', 'updated_at'
+        ]
+
+
+class OrderStatusUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating order status"""
+    class Meta:
+        model = Order
+        fields = ['status']
+        
+    def validate_status(self, value):
+        """Validate that the status is one of the allowed choices"""
+        valid_statuses = [status[0] for status in Order.STATUS_CHOICES]
+        if value not in valid_statuses:
+            raise serializers.ValidationError(
+                f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
+            )
+        return value

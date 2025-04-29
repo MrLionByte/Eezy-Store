@@ -143,7 +143,7 @@ export default function AdminProductsPage() {
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center">
                             <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                            <span className="ml-1">{product.rating ? parseFloat(product.rating).toFixed(1) : "N/A"}</span>
+                            <span className="ml-1">{product.average_rating ? parseFloat(product.average_rating).toFixed(1) : "N/A"}/{product?.rating_count}</span>
                           </div>
                         </TableCell>
                         <TableCell className="text-right">

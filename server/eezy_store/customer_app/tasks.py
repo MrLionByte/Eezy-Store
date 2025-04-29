@@ -30,5 +30,4 @@ def verify_email_otp(request):
     if verify_otp(email, otp_input):
         return JsonResponse({'message': 'OTP verified successfully!'})
     else:
-        # OTP is invalid
         return JsonResponse({'message': 'Invalid OTP.'}, status=400)

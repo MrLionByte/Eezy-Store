@@ -43,10 +43,8 @@ export default function UserRoutes() {
         <Route path="orders" element={<Orders />} />
         </Route>
 
-      {/* Other Routes */}
       <Route path="test" element={<TestPage />} />
 
-      {/* Optional: Fallback for user side */}
       <Route path="*" element={<Navigate to="/" />} />
 
     </Routes>

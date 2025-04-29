@@ -25,8 +25,6 @@ export const useCheckout = () => {
 
   const navigate = useNavigate();
 
-
-  // Fetch addresses initially
   useEffect(() => {
     fetchAddresses();
     fetchCartDetails();

@@ -16,7 +16,7 @@ export const useCheckout = () => {
         address: response.data.address
       };
 
-      return newOrder;  // ✅ just return, no navigate
+      return newOrder;
     } catch (error) {
       console.error('Error placing order:', error);
       throw error;

@@ -5,7 +5,8 @@ from .views import (SignupView, LoginView,
                     AddToCartView, UpdateCartItemView,
                     RemoveCartItemView, AddressListCreateView,
                     AddressSelectView, CheckoutView,
-                    PlaceOrderView)
+                    PlaceOrderView, OrderListView,
+                    RatingSubmitView)
 
 urlpatterns = [
     path('signup', SignupView.as_view(), name='signup'),
@@ -25,5 +26,8 @@ urlpatterns = [
     
     path('addresses/', AddressListCreateView.as_view(), name='address-list-create'),
     path('addresses/select/<int:pk>/', AddressSelectView.as_view(), name='address-select'),
+    
+    path('orders/', OrderListView.as_view(), name='order-list'),
+    path('orders/rate/<int:order_item_id>/', RatingSubmitView.as_view(), name='submit-rating'),
 
 ]

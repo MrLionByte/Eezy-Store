@@ -16,7 +16,10 @@ from django.db.models import Prefetch
 from core_app.models import Address, Product, Rating, Order, OrderItem
 
 from .permission import IsAdmin
-from .serializers import LoginSerializer, CustomerListSerializer, ProductSerializer
+from .serializers import (LoginSerializer, CustomerListSerializer,
+                          ProductSerializer, OrderSerializer,
+                          OrderDetailSerializer,OrderStatusUpdateSerializer
+                          )
 
 logger = logging.getLogger(__name__)
 
@@ -73,8 +76,8 @@ class AdminLoginView(APIView):
             key='refresh',
             value=str(refresh),
             httponly=True,
-            # secure=True,  # Use only with HTTPS
-            secure=False,  # Use only with HTTP
+            secure=True,  # Use only with HTTPS
+            # secure=False,  # Use only with HTTP
             samesite='Lax',
             max_age=86400,  # 1 day
         )
@@ -257,3 +260,66 @@ class ProductSoftDeleteView(generics.UpdateAPIView):
             {"detail": "Product soft-deleted successfully"},
             status=status.HTTP_200_OK)
 
+class OrderListView(generics.ListAPIView):
+    """
+    List all orders with efficient ORM queries for admin panel.
+    Uses select_related and prefetch_related to minimize database queries.
+    """
+    permission_classes = [IsAdmin]
+    serializer_class = OrderSerializer
+    
+    def get_queryset(self):
+        return Order.objects.all() \
+            .select_related('user', 'address') \
+            .prefetch_related(
+                Prefetch(
+                    'items',
+                    queryset=OrderItem.objects.select_related('product')
+                )
+            ) \
+            .order_by('-created_at')
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({"orders": serializer.data}, status=status.HTTP_200_OK)
+
+
+class OrderDetailView(generics.RetrieveAPIView):
+    """
+    Retrieve detailed information about a specific order.
+    """
+    permission_classes = [IsAdmin]
+    serializer_class = OrderDetailSerializer
+    
+    def get_queryset(self):
+        return Order.objects.all() \
+            .select_related('user', 'address') \
+            .prefetch_related(
+                Prefetch(
+                    'items',
+                    queryset=OrderItem.objects.select_related('product')
+                )
+            )
+
+
+class OrderStatusUpdateView(generics.UpdateAPIView):
+    """
+    Update the status of an order.
+    """
+    permission_classes = [IsAdmin]
+    serializer_class = OrderStatusUpdateSerializer
+    queryset = Order.objects.all()
+    http_method_names = ['patch']
+    
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        
+        data = {'status': serializer.validated_data.get('status')}
+        
+        self.perform_update(serializer)
+        
+        return Response(serializer.data)

@@ -158,3 +158,41 @@ export const checkOutService = {
   },
 };
 
+export const orderService = {
+  list: async () => {
+    const response = await api.get(API_ENDPOINTS.orders.list);
+    return response.data;
+  },
+
+  rating: async (orderId, productId, rating) => {
+    const payload = {
+      order_id: orderId,
+      product_id: productId,
+      rating: rating,
+    };
+    const response = await api.post(API_ENDPOINTS.orders.rate+`${productId}/`, payload);
+    return response.data;
+  },
+};
+
+
+export const AdminOrderService = {
+  list: async () => {
+    const response = await api.get(API_ENDPOINTS.AdminOrdersManagement.order);
+    return response.data;
+  },
+
+  details: async (orderId) => {
+    const response = await api.get(API_ENDPOINTS.AdminOrdersManagement.order+`${orderId}/`);
+    return response.data;
+  },
+
+  change:  async (orderId, newStatus) => {
+    const payload = {
+      status: newStatus
+    };
+    const response = await api.patch(API_ENDPOINTS.AdminOrdersManagement.order+`${orderId}/status/`, payload);
+    return response.data;
+  },
+};
+

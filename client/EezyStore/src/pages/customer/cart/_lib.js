@@ -19,13 +19,12 @@ export const useCart = () => {
   const fetchCart = async () => {
     try {
       const data = await cartService.getCart();
-      console.log(data);
       
-      const cartData = data[0] || {};  // Safeguard if there's no data
-        setCartItems(cartData?.items || []);  // Access items from the response correctly
+      const cartData = data[0] || {}; 
+        setCartItems(cartData?.items || []);  
         calculateTotal(cartData?.items || []);
     } catch (error) {
-      console.error('Error fetching cart:', error);
+      // console.error('Error fetching cart:', error);
     }
   };
 
@@ -49,7 +48,7 @@ export const useCart = () => {
       fetchCart();
       toast({ title: "Updated!", description: "Quantity updated successfully." });
     } catch (error) {
-      console.error('Error updating quantity:', error);
+      // console.error('Error updating quantity:', error);
     }
   };
 
@@ -57,12 +56,12 @@ export const useCart = () => {
     if (window.confirm('Are you sure you want to remove this item from cart?')) {
       try {
         const response = await cartService.removeItem(itemId);
-        console.log(response);
+        // console.log(response);
         
         toast({ title: "Removed", description: "Item removed from cart." });
         setFetchFromBackend(true);
     } catch (error) {
-        console.error('Error removing item:', error);
+        // console.error('Error removing item:', error);
       }
     }
   };
@@ -75,7 +74,7 @@ export const useCart = () => {
         setTotalPrice(0);
         toast({ title: "Cart Cleared" });
       } catch (error) {
-        console.error('Error clearing cart:', error);
+        // console.error('Error clearing cart:', error);
       }
     }
   };

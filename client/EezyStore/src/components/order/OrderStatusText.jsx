@@ -1,9 +1,7 @@
 export const OrderStatusText = ({ status }) => {
     switch (status) {
-      case 'pending':
-        return <span className="text-amber-500">Pending</span>;
-      case 'processing':
-        return <span className="text-blue-500">Processing</span>;
+      case 'approved':
+        return <span className="text-amber-500">approved</span>;
       case 'shipped':
         return <span className="text-purple-500">Shipped</span>;
       case 'delivered':

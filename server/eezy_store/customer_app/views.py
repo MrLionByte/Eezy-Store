@@ -77,8 +77,8 @@ class LoginView(APIView):
             key='refresh',
             value=str(refresh),
             httponly=True,
-            # secure=True,  # Use only with HTTPS
-            secure=False,  # Use only with HTTP
+            secure=True,  # Use only with HTTPS
+            # secure=False,  # Use only with HTTP
             samesite='Lax',
             max_age=86400,  # 1 day
         )
@@ -336,3 +336,48 @@ class PlaceOrderView(APIView):
 
         except Cart.DoesNotExist:
             return Response({'detail': 'Cart not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class OrderListView(APIView):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        orders = Order.objects.filter(user=request.user) \
+            .select_related('address') \
+            .prefetch_related(
+                'items__product',
+            ) \
+            .order_by('-created_at')
+
+        serializer = OrderSerializer(orders, many=True, context={'user': request.user})
+        return Response({"orders": serializer.data}, status=status.HTTP_200_OK)
+    
+
+class RatingSubmitView(APIView):
+    def post(self, request, order_item_id):
+        if not request.user.is_authenticated:
+            return Response({"error": "User not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        order_item = OrderItem.objects.filter(id=order_item_id).first()
+        if not order_item:
+            return Response({"error": "Order item not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if order_item.order.status != 'delivered':
+            return Response({"error": "Order must be delivered to rate products"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if Rating.objects.filter(product=order_item.product, user=request.user).exists():
+            return Response({"error": "You have already rated this product"}, status=status.HTTP_400_BAD_REQUEST)
+
+        rating_score = request.data.get('rating')
+        try:
+            rating_score = int(rating_score)
+            if rating_score < 1 or rating_score > 5:
+                return Response({"error": "Rating must be between 1 and 5"}, status=status.HTTP_400_BAD_REQUEST)
+        except (TypeError, ValueError):
+            return Response({"error": "Invalid rating value"}, status=status.HTTP_400_BAD_REQUEST)
+
+        Rating.objects.create(product=order_item.product, user=request.user, score=rating_score)
+
+        return Response({"message": "Rating submitted successfully"}, status=status.HTTP_201_CREATED)
+

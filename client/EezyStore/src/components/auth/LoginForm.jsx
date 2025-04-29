@@ -24,7 +24,6 @@ export default function LoginForm() {
     try {
       const response = await authService.login({ email, password });
 
-      // Store token and user info
       localStorage.setItem('access', response.access);
       localStorage.setItem('user', JSON.stringify({
           email: response.user.email,
@@ -43,7 +42,6 @@ export default function LoginForm() {
     }, 2000);
       
     } catch (err) {
-        console.log(err);
         if (err.response?.status === 400) {
             if (err.response.data.error[0] == ['not-exist']) {
                 setError('User with given email does not exist');
