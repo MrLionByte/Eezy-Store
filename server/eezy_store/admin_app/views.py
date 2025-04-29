@@ -78,7 +78,7 @@ class AdminLoginView(APIView):
             httponly=True,
             secure=True,  # Use only with HTTPS
             # secure=False,  # Use only with HTTP
-            samesite='Lax',
+            samesite='None',
             max_age=86400,  # 1 day
         )
         
