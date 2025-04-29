@@ -141,6 +141,9 @@ DATABASES = {
     )
 }
 
+# Manually override ENGINE to use psycopg (3.x)
+DATABASES['default']['ENGINE'] = 'django.db.backends.postgresql_psycopg'
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
