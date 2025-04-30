@@ -59,7 +59,7 @@ export default function AdminProductsPage() {
     openEditDialog,
     openDetailsDialog,
   } = useAdminProductsLogic();
-
+  const  imageBaseUrl = import.meta.env.VITE_IMAGE_URL;
   return (
     <>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -133,7 +133,7 @@ export default function AdminProductsPage() {
                       <TableRow key={product.id}>
                         <TableCell>
                           <img 
-                            src={product.image || "/api/placeholder/200/200"} 
+                            src={`${imageBaseUrl}${product.image}` || "/api/placeholder/200/200"} 
                             alt={product.name} 
                             className="h-10 w-10 rounded-md object-cover"
                           />

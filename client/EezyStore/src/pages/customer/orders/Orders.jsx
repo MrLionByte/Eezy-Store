@@ -171,7 +171,7 @@ const Orders = () => {
                                 <div className="flex items-start">
                                   <div className="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden">
                                     <img
-                                      src={`${imageBaseUrl}`+`${item.product.image}`}
+                                      src={item.product.image}
                                       alt={item.product_name}
                                       className="w-full h-full object-cover"
                                     />
