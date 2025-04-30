@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import dj_database_url
+import cloudinary, cloudinary.uploader, cloudinary.api
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -52,6 +53,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'cloudinary_storage',
+    'cloudinary',
     'django_structlog',
 ]
 
@@ -180,8 +183,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -247,3 +250,17 @@ LOGGING = {
         },
     },
 }
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('cloudinary_cloud_name'),
+    'API_KEY': os.environ.get('cloudinary_api_key'),
+    'API_SECRET': os.environ.get('cloudinary_api_secret'),
+    'SECURE': True
+}
+
+# cloudinary.config(
+#     cloud_name=os.environ.get("cloudinary_cloud_name"),
+#     api_key=os.environ.get("cloudinary_api_key"),
+#     api_secret=os.environ.get("cloudinary_api_secret"),
+#     cloudinary_secure=True,
+# )
