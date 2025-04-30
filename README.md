@@ -109,8 +109,6 @@ cloudinary_api_secret='get from cloudinary'
 cloudinary_secure=True default
 
 Frontend:
-
-```
 VITE_API_URL='your backend url'
 VITE_IMAGE_URL=http://res.cloudinary.com/ + 'your cloudinary_cloud_name'/
 ---
