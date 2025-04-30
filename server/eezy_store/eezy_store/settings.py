@@ -258,9 +258,9 @@ CLOUDINARY_STORAGE = {
     'SECURE': True
 }
 
-# cloudinary.config(
-#     cloud_name=os.environ.get("cloudinary_cloud_name"),
-#     api_key=os.environ.get("cloudinary_api_key"),
-#     api_secret=os.environ.get("cloudinary_api_secret"),
-#     cloudinary_secure=True,
-# )
+cloudinary.config(
+    cloud_name=os.environ.get("cloudinary_cloud_name"),
+    api_key=os.environ.get("cloudinary_api_key"),
+    api_secret=os.environ.get("cloudinary_api_secret"),
+    cloudinary_secure=True,
+)
