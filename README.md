@@ -8,13 +8,14 @@
 
 ### ✅ Core Functionality
 - 🔐 User Authentication (JWT-based)
+- 👥 User management
 - 📦 Product & Order Management
 - 🧾 Cart & Checkout Flow
-- 💬 Product Reviews & Ratings
+- 💬 Product Ratings After Purchase
 - 📍 Address Management
 
 ### 🖥️ Frontend
-- Built with **React** + **Tailwind CSS**
+- Built with **React** + **Tailwind CSS** + **Shadcn**
 - Modern, responsive UI
 - Clean component architecture
 - Integrated user & admin interfaces
@@ -24,6 +25,8 @@
 - RESTful API design
 - Modular service-based structure
 - Admin capabilities for managing orders, users, and products
+- DB using PSQL
+- Media using cloudinary
 
 ---
 
@@ -46,7 +49,6 @@ Eezy-Store/
 ├── frontend/        # React app
 │   └── ...
 ├── README.md
-└── requirements.txt
 ```
 
 ---
@@ -77,6 +79,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+or gunicorn -w 4 eezy_store.wsgi:application
 ```
 
 3. **Frontend Setup**
@@ -87,6 +90,29 @@ npm install
 npm run dev
 ```
 
+4. **Sample env**
+
+```bash
+Backend:
+SECRET_KEY='your secret key'
+ALLOWED_HOSTS='allowed host headers'
+CORS_ALLOWED_ORIGINS='allowed origins'
+DEBUG='True' if development, in production 'False'
+EMAIL_USE_TLS=True
+EMAIL_PORT=587 default
+EMAIL_HOST_USER='your host email address'
+EMAIL_HOST_PASSWORD='your host app password'
+DATABASE_URL='any psql provider url'
+cloudinary_cloud_name='get from cloudinary'
+cloudinary_api_key='get from cloudinary'
+cloudinary_api_secret='get from cloudinary'
+cloudinary_secure=True default
+
+Frontend:
+
+```
+VITE_API_URL='your backend url'
+VITE_IMAGE_URL=http://res.cloudinary.com/ + 'your cloudinary_cloud_name'/
 ---
 
 ## 🧑‍💻 Contributing
