@@ -21,6 +21,10 @@ class Address(models.Model):
         verbose_name = 'Address'
         verbose_name_plural = 'Addresses'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['created_at'])
+        ]
     
     def __str__(self):
         return f"{self.street}, {self.city}, {self.state}, {self.country}, {self.postal_code}"
@@ -58,6 +62,12 @@ class Product(models.Model):
 
     objects = ProductManager()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['is_deleted']),
+            models.Index(fields=['created_at'])
+        ]
+    
     def __str__(self):
         return self.name
     
@@ -76,6 +86,12 @@ class Rating(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        indexes = [
+            models.Index(fields=['products']),
+            models.Index(fields=['user'])
+        ]
+    
     def __str__(self):
         return f"{self.user.username} rated {self.product.name} with {self.score}"
 
@@ -89,6 +105,9 @@ class Cart(models.Model):
         verbose_name = 'Cart'
         verbose_name_plural = 'Carts'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user']),
+        ]
     
     def __str__(self):
         return f"{self.user.username} - Cart"
@@ -105,6 +124,10 @@ class CartItem(models.Model):
         verbose_name = 'Cart Item'
         verbose_name_plural = 'Cart Items'
         ordering = ['-cart__created_at']
+        indexes = [
+            models.Index(fields=['cart']),
+            models.Index(fields=['product']),
+        ]
     
     def __str__(self):
         return f"{self.product.name} in {self.cart}"
@@ -128,6 +151,11 @@ class Order(models.Model):
         verbose_name = 'Order'
         verbose_name_plural = 'Orders'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['status']),
+            models.Index(fields=['created_at']),
+        ]
     
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
@@ -150,6 +178,10 @@ class OrderItem(models.Model):
         verbose_name = 'Order Item'
         verbose_name_plural = 'Order Items'
         ordering = ['-order__created_at']
+        indexes = [
+            models.Index(fields=['order']),
+            models.Index(fields=['product'])
+        ]
     
     def __str__(self):
         return f"{self.product.name} in {self.order}"
