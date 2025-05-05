@@ -8,7 +8,7 @@ from core_app.models import Address, Product, Rating, Order, OrderItem
 
 class LoginSerializer(serializers.Serializer):
     """
-    Serializer for user login.
+    Serializer for admin login.
     """
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
