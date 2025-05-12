@@ -88,7 +88,7 @@ class Rating(models.Model):
     
     class Meta:
         indexes = [
-            models.Index(fields=['products']),
+            models.Index(fields=['product']),
             models.Index(fields=['user'])
         ]
     
