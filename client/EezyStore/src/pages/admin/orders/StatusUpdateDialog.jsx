@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "./StatusBadge";
 import OrderStatusUpdate from "./OrderStatusUpdate";
@@ -15,7 +14,6 @@ export default function StatusUpdateDialog({
   handleStatusChange 
 }) {
   const [newStatus, setNewStatus] = useState(selectedOrder?.status || "approved");
-  const [statusNote, setStatusNote] = useState("");
   
   const onStatusChange = async () => {
     await handleStatusChange(selectedOrder.id, newStatus);

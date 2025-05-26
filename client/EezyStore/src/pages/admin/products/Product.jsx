@@ -1,5 +1,3 @@
-// pages/admin/products/index.jsx
-import React from "react";
 import {
   Card,
   CardContent,
@@ -33,7 +31,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Eye, Pencil, Plus, Star, Trash2, MoreHorizontal, Loader2 } from "lucide-react";
 import { ProductForm } from "../../../components/products/ProductForm";
 import { ProductDetails } from "../../../components/products/ProductDetails";

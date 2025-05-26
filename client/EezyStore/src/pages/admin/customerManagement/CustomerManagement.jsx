@@ -1,19 +1,3 @@
-import React, { useState } from "react";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { AppSidebar } from "../../../components/dashboard/app-sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -45,8 +29,6 @@ import {
   CheckCircle,
   XCircle,
   UserCheck,
-  AlertCircle,
-  ShieldCheck,
   Filter,
 } from "lucide-react";
 import {
@@ -58,20 +40,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
 import { useCustomerManagement } from "./_lib";
 
 export default function CustomerManagement() {
   const {
     users,
-    loading,
-    error,
     selectedUser,
     isDetailsDialogOpen,
     openDetailsDialog,

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Search, Filter, Package } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { 
@@ -39,7 +38,7 @@ export default function AdminOrdersPage() {
   return (
     <>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        {/* Search and Filter Bar */}
+
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -68,7 +67,6 @@ export default function AdminOrdersPage() {
           </div>
         </div>
         
-        {/* Orders Table */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -99,7 +97,6 @@ export default function AdminOrdersPage() {
           </CardFooter>
         </Card>
         
-        {/* Dialogs */}
         {selectedOrder && (
           <>
             <OrderDetailsDialog 

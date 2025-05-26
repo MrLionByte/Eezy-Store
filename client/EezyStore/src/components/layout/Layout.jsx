@@ -10,6 +10,7 @@ const Layout = (props) => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
+      
       {/* Header/Navigation */}
       <header className="sticky top-0 z-10 bg-white shadow-sm">
         <div className="container mx-auto px-4">

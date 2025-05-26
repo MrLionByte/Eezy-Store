@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { CheckCircle, PlusCircle, CreditCard, Home, Wallet, Landmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +13,6 @@ const Checkout = () => {
     totalPrice,
     addresses,
     selectedAddressId,
-    paymentMethod,
     isNewAddressOpen,
     newAddress,
     isOrderConfirmOpen,
@@ -22,12 +20,7 @@ const Checkout = () => {
     setShowSuccessModal,
     setIsOrderConfirmOpen,
     setSelectedAddressId,
-    setPaymentMethod,
     setIsNewAddressOpen,
-    setNewAddress,
-    clearCart,
-    addAddress,
-    placeOrder,
     handleAddressSubmit,
     handleNewAddressChange,
     confirmPlaceOrder,

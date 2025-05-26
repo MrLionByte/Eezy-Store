@@ -1,6 +1,5 @@
-// AdminProductsPage_lib.js
 import { useState, useEffect } from "react";
-import { adminProductService } from "../../../services/apiService"; // adjust path if needed
+import { adminProductService } from "../../../services/apiService"; 
 import { toast } from "@/hooks/use-toast";
 
 const emptyProductForm = {

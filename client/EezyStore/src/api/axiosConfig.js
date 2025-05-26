@@ -13,7 +13,7 @@ const api = axios.create({
 
 const publicUrls = [API_ENDPOINTS.auth.login, API_ENDPOINTS.auth.signup, API_ENDPOINTS.adminAuth.login];
 
-// Request interceptor
+
 api.interceptors.request.use(
   (config) => {
     

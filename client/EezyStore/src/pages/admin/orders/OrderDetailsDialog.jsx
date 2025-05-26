@@ -21,7 +21,6 @@ export default function OrderDetailsDialog({ selectedOrder, addressDialog, setAd
         </DialogHeader>
         
         <div className="grid gap-6 py-4">
-          {/* Customer Information */}
           <div>
             <h3 className="text-lg font-medium mb-2">Customer Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -50,7 +49,6 @@ export default function OrderDetailsDialog({ selectedOrder, addressDialog, setAd
             </div>
           </div>
           
-          {/* Shipping Address */}
           <div>
             <h3 className="text-lg font-medium mb-2">Shipping Address</h3>
             <div className="text-sm">
@@ -61,7 +59,6 @@ export default function OrderDetailsDialog({ selectedOrder, addressDialog, setAd
             </div>
           </div>
           
-          {/* Order Items */}
           <div>
             <h3 className="text-lg font-medium mb-2">Order Items</h3>
             <Table>
@@ -78,12 +75,12 @@ export default function OrderDetailsDialog({ selectedOrder, addressDialog, setAd
                     <TableRow key={index}>
                     <TableCell>{item.product.name}</TableCell>
                     <TableCell className="text-right">
-                        {/* Convert item.price to a number and then apply toFixed */}
+                       
                         ${isNaN(Number(item?.price)) ? 'N/A' : Number(item?.price).toFixed(2)}
                     </TableCell>
                     <TableCell className="text-right">{item.quantity}</TableCell>
                     <TableCell className="text-right">
-                        {/* Ensure price and quantity are valid before calculating */}
+                       
                         ${isNaN(Number(item?.price)) || isNaN(Number(item?.quantity)) ? 'N/A' : (Number(item?.price) * item.quantity).toFixed(2)}
                     </TableCell>
                     </TableRow>
