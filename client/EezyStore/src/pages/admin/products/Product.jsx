@@ -44,6 +44,7 @@ export default function AdminProductsPage() {
   const {
     products,
     selectedProduct,
+    handleClearFormData,
     formData,
     setFormData,
     isAddDialogOpen,
@@ -71,7 +72,7 @@ export default function AdminProductsPage() {
             </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="flex items-center gap-1">
+                <Button onClick={handleClearFormData} className="flex items-center gap-1">
                   <Plus size={16} /> Add Product
                 </Button>
               </DialogTrigger>

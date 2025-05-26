@@ -42,10 +42,14 @@ export default function LoginForm() {
     }, 2000);
       
     } catch (err) {
+      console.log(err);
+      
         if (err.response?.status === 400) {
             if (err.response.data.error[0] == ['not-exist']) {
                 setError('User with given email does not exist');
             } else if (err.response.data.error[0] == ['wrong-password']) {
+                setError('Wrong password, try again');
+            } else if (err.response.data.error[0] == ['password-mismatch']) {
                 setError('Wrong password, try again');
             } else if (err.response.data.error[0] == ['account-not-activated']) {
                 setError('Account not activated yet, please wait or contact support');

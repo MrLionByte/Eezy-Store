@@ -53,17 +53,19 @@ export function useAdminProductsLogic() {
     }
   };
 
+  const handleClearFormData = () => {
+    setFormData(emptyProductForm)
+  }
+
   const handleAddProduct = async () => {
     setIsLoading(true);
     try {
       const productData = new FormData();
   
-      // Add text fields
       productData.append('name', formData.name);
       productData.append('price', formData.price);
       productData.append('description', formData.description);
       
-      // Add image file if exists
       if (formData.image instanceof File) {
         productData.append('image', formData.image);
       }
@@ -86,8 +88,6 @@ export function useAdminProductsLogic() {
         errorData = error.response.data.image[0] || 'Check image type';
       }
   
-      console.error("Failed to add product:", error);
-  
       toast({
         title: "Error",
         description: `${errorData}`,
@@ -103,20 +103,16 @@ export function useAdminProductsLogic() {
     try {
       const productData = new FormData();
   
-      // Add text fields (similar to handleAddProduct)
       productData.append('name', formData.name);
       productData.append('price', formData.price);
       productData.append('description', formData.description);
   
-      // Add image file if exists (check if it's a File object)
       if (formData.image instanceof File) {
         productData.append('image', formData.image);
       }
   
-      // Send the updated product data to the backend
       const updatedProduct = await adminProductService.edit(selectedProduct.id, productData);
   
-      // Update the product in the list
       setProducts(prev => prev?.map(product => 
         product.id === selectedProduct.id ? updatedProduct : product
       ));
@@ -124,23 +120,18 @@ export function useAdminProductsLogic() {
       setIsEditDialogOpen(false);
       setFormData(emptyProductForm);
   
-      // Success toast notification
       toast({
         title: "Success",
         description: "Product updated successfully!",
       });
   
-      // Trigger fetch from backend to refresh data
       setFetchFromBackend(true);
     } catch (error) {
       let errorData = 'Failed to update product. Please try again.';
     
-      // Check if there's a specific error response related to image
       if (error.response?.data?.image) {
         errorData = error.response.data.image[0] || 'Check image type';
       }
-  
-      console.error("Failed to update product:", error);
   
       toast({
         title: "Error",
@@ -158,7 +149,7 @@ export function useAdminProductsLogic() {
       setIsLoading(true);
       try {
         await adminProductService.softDelete(id);
-        // Option 1: remove product from frontend immediately
+  
         setProducts(prev => prev?.filter(product => product.id !== id));
         toast({
           title: "Success",
@@ -166,7 +157,6 @@ export function useAdminProductsLogic() {
         });
         setFetchFromBackend(true);
       } catch (error) {
-        console.error("Failed to delete product:", error);
         toast({
           title: "Error",
           description: "Failed to delete product. Please try again.",
@@ -199,7 +189,6 @@ export function useAdminProductsLogic() {
       setSelectedProduct(productDetails);
       setIsDetailsDialogOpen(true);
     } catch (error) {
-      console.error("Failed to get product details:", error);
       toast({
         title: "Error",
         description: "Failed to load product details. Please try again.",
@@ -214,6 +203,7 @@ export function useAdminProductsLogic() {
     products,
     selectedProduct,
     formData,
+    handleClearFormData,
     setFormData,
     isAddDialogOpen,
     setIsAddDialogOpen,
@@ -248,15 +238,13 @@ export const handleFormChange = (formData, setFormData, e) => {
   }
 };
 
-// Handle image upload
 export function handleImageUpload(formData, setFormData, event) {
-    const file = event.target.files[0];  // Get the first file from the file input
+    const file = event.target.files[0]; 
     if (file) {
-      // Set the file object in the formData state
       setFormData({
         ...formData,
         image: file,
-        imagePreview: URL.createObjectURL(file), // This will create a preview URL for the image
+        imagePreview: URL.createObjectURL(file),
       });
     }
   }

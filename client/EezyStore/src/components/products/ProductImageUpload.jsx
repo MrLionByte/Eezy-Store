@@ -4,12 +4,13 @@ import { Input } from "@/components/ui/input";
 import { handleImageUpload } from "../../pages/admin/products/_lib";
 
 export function ProductImageUpload({ formData, setFormData }) {
+  const  imageBaseUrl = import.meta.env.VITE_IMAGE_URL;
   return (
     <div className="space-y-2">
       <Label htmlFor="image">Product Image</Label>
       <div className="flex flex-col items-center gap-4">
         <img 
-          src={formData.imagePreview} 
+          src={`${imageBaseUrl}${formData.imagePreview}`} 
           alt="Product preview" 
           className="h-40 w-40 rounded-md object-cover border" 
         />

@@ -12,17 +12,14 @@ export function useOrdersManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  // Load orders on component mount
   useEffect(() => {
     const loadOrders = async () => {
       try {
         setLoading(true);
         const data = await AdminOrderService.list();
-        console.log(data);
         
-        setOrders(data.orders); // assuming the backend returns { orders: [...] }
+        setOrders(data.orders); 
       } catch (err) {
-        console.error('Error loading orders:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -32,7 +29,6 @@ export function useOrdersManagement() {
     loadOrders();
   }, []);
 
-  // Filter orders based on search term and status filter
   const filteredOrders = orders.filter(order => {
     const matchesSearch =
       String(order.id).toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -44,46 +40,39 @@ export function useOrdersManagement() {
     return matchesSearch && matchesStatus;
   });
 
-  // Update the status of an order
   const handleStatusChange = async (orderId, newStatus) => {
     setUpdatingStatus(true);
     try {
       const updatedOrder = await AdminOrderService.change(orderId, newStatus);
 
-      // Update orders list
       setOrders(prevOrders =>
         prevOrders.map(order =>
           order.id === orderId ? { ...order, status: newStatus } : order
         )
       );
 
-      // Update selected order if necessary
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder(prev => ({ ...prev, status: newStatus }));
       }
 
       return true;
     } catch (err) {
-      console.error('Error updating order status:', err);
       setError(err.message);
       return false;
     } finally {
       setTimeout(() => {
         setUpdatingStatus(false);
         setStatusDialog(false);
-      }, 2800); // optional for animation
+      }, 2800); 
     }
   };
 
-  // Load single order details
   const fetchOrderDetails = async (orderId) => {
     try {
       const order = await AdminOrderService.details(orderId);
-      console.log(order);
       
       setSelectedOrder(order);
     } catch (err) {
-      console.error('Error fetching order details:', err);
       setError(err.message);
     }
   };
@@ -106,7 +95,7 @@ export function useOrdersManagement() {
     setStatusFilter,
     filteredOrders,
     handleStatusChange,
-    fetchOrderDetails, // expose this too
+    fetchOrderDetails, 
   };
 }
 

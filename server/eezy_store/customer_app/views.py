@@ -8,6 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework.exceptions import ValidationError
 
 from core_app.models import Product, Rating, Address, Order, OrderItem, Cart, CartItem
 
@@ -111,9 +112,13 @@ class LoginView(APIView):
             response.set_cookie('ip', request.META.get('REMOTE_ADDR', ''))
 
             return response
-        
+
+        except ValidationError as ve:
+            # Let DRF handle validation error properly (status 400)
+            raise ve
+
         except Exception as e:
-            logger.error(f"Unexpected error during login", extra={'data': {str(e)}})
+            logger.error("Unexpected error during login", extra={'data': str(e)})
             return Response({
                 "error": "internal-error",
                 "message": "An unexpected error occurred. Please try again later."
