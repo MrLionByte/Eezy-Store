@@ -1,4 +1,6 @@
 import logging
+from django.db import transaction
+from django.db.models import F
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import login, logout
 from rest_framework import generics, permissions, status
@@ -547,6 +549,7 @@ class PlaceOrderView(APIView):
     - 400: Missing address ID, empty cart, or other validation error.
     - 403: If the user is not authenticated.
     - 404: Address or cart not found.
+    - 500: Database transaction failed.
     """
     
     permission_classes = [permissions.IsAuthenticated]
@@ -572,31 +575,35 @@ class PlaceOrderView(APIView):
                 logger.warning("Cart is empty", extra={'data': cart})
                 return Response({'detail': 'Cart is empty.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            order = Order.objects.create(
-                user=request.user,
-                address=address,
-                status='approved',
-                total_amount=0 
-            )
-
-            total = 0
-            order_items = []
-            for item in cart_items:
-                order_item = OrderItem(
-                    order=order,
-                    product=item.product,
-                    quantity=item.quantity,
-                    price=item.product.price
+            with transaction.atomic():
+                order = Order.objects.create(
+                    user=request.user,
+                    address=address,
+                    status='approved',
+                    total_amount=0 
                 )
-                total += item.quantity * item.product.price
-                order_items.append(order_item)
+
+                total = 0
+                order_items = []
+                
+                for item in cart_items:
+                    order_item = OrderItem(
+                        order=order,
+                        product=item.product,
+                        quantity=item.quantity,
+                        price=item.product.price
+                    )
+                    total += item.quantity * item.product.price
+                    order_items.append(order_item)
             
-            OrderItem.objects.bulk_create(order_items)
+                OrderItem.objects.bulk_create(order_items)
 
-            order.total_amount = total
-            order.save()
+                order.total_amount = total
+                order.save()
 
-            cart.items.all().delete()
+                cart.items.all().delete()
+                
+                logger.info(f"Order {order.id} created successfully for user {request.user.username}")
 
             serialized_order = OrderSerializer(order)
 
@@ -608,6 +615,12 @@ class PlaceOrderView(APIView):
         except Cart.DoesNotExist:
             logger.warning("Cart not found for user", extra={'data': request.user})
             return Response({'detail': 'Cart not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        except Exception as e:
+            logger.error(f"Error placing order for user {request.user.username}: {str(e)}")
+            return Response({
+                'detail': 'Failed to place order. Please try again.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
 class OrderListView(APIView):
