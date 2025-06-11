@@ -9,6 +9,10 @@ const API_ENDPOINTS = {
     adminAuth: {
       login: '/admin/login',
     },
+
+    adminDashboardData: {
+      list: '/admin/top-products/',
+    },
     
     adminCustomerManagement: {
       list: '/admin/customers',

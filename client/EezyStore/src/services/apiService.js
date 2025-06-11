@@ -25,6 +25,12 @@ export const authService = {
       },
 };
 
+export const adminDashboardService = {
+  getTopProducts: async () => {
+    const response = await api.get(API_ENDPOINTS.adminDashboardData.list);
+    return response.data;
+  },
+}
 
 export const adminCustomerService = {
   list: async () => {

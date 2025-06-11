@@ -4,7 +4,9 @@ from .views import (AdminLoginView, ListAllCustomersView,
                     UnblockUserView, ProductCreateView,
                     ProductListView,ProductUpdateView,
                     ProductSoftDeleteView, OrderDetailView,
-                    OrderListView, OrderStatusUpdateView)
+                    OrderListView, OrderStatusUpdateView,
+                    TopProductsAPIView
+                    )
 
 urlpatterns = [
     path('login', AdminLoginView.as_view(), name='admin_login'),
@@ -23,4 +25,5 @@ urlpatterns = [
     path('orders/<int:pk>/', OrderDetailView.as_view(), name='admin-order-detail'),
     path('orders/<int:pk>/status/', OrderStatusUpdateView.as_view(), name='admin-order-status-update'),
 
+    path('top-products/', TopProductsAPIView.as_view(), name='top-products'),
 ]

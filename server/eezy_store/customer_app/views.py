@@ -712,3 +712,14 @@ class RatingSubmitView(APIView):
         Rating.objects.create(product=order_item.product, user=request.user, score=rating_score)
         return Response({"message": "Rating submitted successfully"}, status=status.HTTP_201_CREATED)
 
+
+class KeepWebSiteLive(APIView):
+    """
+    Keep the website live by responding to a simple GET request.
+    """
+    permission_classes = [permissions.AllowAny]
+    
+    def get(self, request):
+        return Response({"status": "Website is live"}, status=status.HTTP_200_OK)
+    
+    

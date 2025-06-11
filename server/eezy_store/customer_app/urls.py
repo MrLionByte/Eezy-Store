@@ -6,7 +6,8 @@ from .views import (SignupView, LoginView,
                     RemoveCartItemView, AddressListCreateView,
                     AddressSelectView, CheckoutView,
                     PlaceOrderView, OrderListView,
-                    RatingSubmitView)
+                    RatingSubmitView,
+                    KeepWebSiteLive)
 
 urlpatterns = [
     path('signup', SignupView.as_view(), name='signup'),
@@ -29,5 +30,7 @@ urlpatterns = [
     
     path('orders/', OrderListView.as_view(), name='order-list'),
     path('orders/rate/<int:order_item_id>/', RatingSubmitView.as_view(), name='submit-rating'),
+    
+    path("keep-website-live", KeepWebSiteLive.as_view())
 
 ]

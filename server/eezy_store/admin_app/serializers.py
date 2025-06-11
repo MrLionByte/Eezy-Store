@@ -127,3 +127,8 @@ class OrderStatusUpdateSerializer(serializers.ModelSerializer):
                 f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
             )
         return value
+    
+
+class TopProductSerializer(serializers.Serializer):
+    product_name = serializers.CharField()
+    total_sales = serializers.IntegerField()

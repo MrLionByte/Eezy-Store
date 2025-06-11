@@ -11,14 +11,15 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Prefetch
+from django.db.models import Prefetch, F, Sum
 
 from core_app.models import Address, Product, Rating, Order, OrderItem
 
 from .permission import IsAdmin
 from .serializers import (LoginSerializer, CustomerListSerializer,
                           ProductSerializer, OrderSerializer,
-                          OrderDetailSerializer,OrderStatusUpdateSerializer
+                          OrderDetailSerializer,OrderStatusUpdateSerializer,
+                          TopProductSerializer
                           )
 
 logger = logging.getLogger(__name__)
@@ -505,3 +506,34 @@ class OrderStatusUpdateView(generics.UpdateAPIView):
         
         logger.info(f'Order_id: {instance.id} Order status updated successfully', extra={'data': serializer.validated_data})
         return Response(serializer.data)
+    
+    
+class TopProductsAPIView(APIView):
+    """
+    Retrieve top-rated products.
+
+    Allows authenticated admin users to view the top-rated products based on sale.
+
+    * GET - Retrieve top-rated products.
+
+    Request Body:
+    - None
+
+    Responses:
+    - 200: List of top-sale products.
+    - 403: If user is not an admin.
+    """
+    
+    permission_classes = [IsAdmin]
+    
+    def get(self, request):
+        top_products = (
+            OrderItem.objects
+            .values(product_name=F('product__name'))
+            .annotate(total_sales=Sum('quantity'))
+            .order_by('-total_sales')[:10]
+        )
+        serializer = TopProductSerializer(top_products, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
